@@ -1,6 +1,6 @@
 # Core Cookbook
 
-Version: Kamailio SIP Server v5.8.x (devel)
+Version: Kamailio SIP Server v6.1.x (devel)
 
 ## Overview
 
@@ -1314,6 +1314,34 @@ Example of usage:
 corelog=1
 ```
 
+### coreparam
+
+This parameter offers a generic framework to set new core parameters without
+the need to write new code in Lex/Yacc, but to add to an internal exports
+structure in the core. The format is:
+
+```
+coreparam[name] = value
+```
+
+The `name` can be a string or an ID, and the `value` can be a string, an ID or
+a number (integer).
+
+Available parameters that can be set via `coreparam` are listed next.
+
+#### random_engine
+
+Set the random engine to be used internally. The values can be:
+
+  * `rand` - use the libc `rand()/random()` functions (the default)
+  * `fast` - use internal `fastrand()` functions (the default)
+
+Example:
+
+```
+coreparam[random_engine] = "fast"
+```
+
 ### debug
 
 Set the debug level. Higher values make Kamailio to print more debug
@@ -1796,6 +1824,7 @@ They can be:
 - `g` (or `G`) - open the module shared object file with `RTLD_GLOBAL` set,
   which can be used for modules related to external scripting languages to avoid
   reloading.
+- `o` (or `O`) - if module is already loaded (e.g., via `--loadmodule`), skip it
 
 Example of usage:
 
@@ -4648,28 +4677,30 @@ In logical evaluation expressions:
 - Negative is FALSE
 - Positive is TRUE
 
-If no value is specified, or a route reaches its end without executing a
-return statement, it returns 1. If return is used in the top level route
-is equivalent with exit `[val]`.
+If no value is specified, it returns 1. If return is used in the top level route
+is equivalent with exit `[val]`. If no `return` is at the end of the routing block,
+the return code is the value of the last executed action, therefore it is highly
+recommended to return an explicit value (e.g., `return(1)`) to avoid unexpected
+config execution.
 
 Example usage:
 
 ``` c
 request_route {
     if (route(RET)) {
-    xlog("L_NOTICE","method $rm is INVITE\n");
+        xlog("L_NOTICE","method $rm is INVITE\n");
     } else {
-    xlog("L_NOTICE","method $rm is REGISTER\n");
+        xlog("L_NOTICE","method $rm is REGISTER\n");
     };
 }
 
 route[RET] {
     if (is_method("INVITE")) {
-    return(1);
+        return(1);
     } else if (is_method("REGISTER")) {
-    return(-1);
+        return(-1);
     } else {
-    return(0);
+        return(0);
     };
 }
 ```
@@ -5125,7 +5156,7 @@ Example of usage:
     }
 ```
 
-### route
+### route block
 
 This block is used to define 'sub-routes' - group of actions that can be
 executed from another routing block. Originally targeted as being
@@ -5176,6 +5207,10 @@ number of recursive levels, avoiding ending up in infinite loops -- see
 
 The sub-route blocks allow to make the configuration file modular,
 simplifying the logic and helping to avoid duplication of actions.
+
+If no `return` is at the end of the routing block, the return code is the value
+of the last executed action, therefore it is highly recommended to return an
+explicit value (e.g., `return(1)`) to avoid unexpected config execution.
 
 ### branch_route
 

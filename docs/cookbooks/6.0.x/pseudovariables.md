@@ -1,6 +1,6 @@
 # Pseudo-Variables
 
-Version: Kamailio SIP Server v6.1.x (devel)
+Version: Kamailio SIP Server v6.0.x (stable)
 
 ## Introduction
 
@@ -1001,16 +1001,6 @@ Example:
 
 ``` c
 xdbg("PATH environment variable:  $env(PATH)\n");
-```
-
-## $envn(NAME) - environment variables as number
-
-**$envn(NAME)** - value-as-number of the environment variable named NAME
-
-Example:
-
-``` c
-xdbg("COUNT environment variable:  $envn(COUNT)\n");
 ```
 
 ## $avp(id) - AVPs

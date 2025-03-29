@@ -20,12 +20,12 @@ jobs:
           fetch-depth: 2
       - name: Get all changed markdown files
         id: changed-markdown-files
-        uses: tj-actions/changed-files@v45
+        uses: tj-actions/changed-files@v46
         with:
           files: |
              **.md
           since_last_remote_commit: true
-      - uses: DavidAnson/markdownlint-cli2-action@v18
+      - uses: DavidAnson/markdownlint-cli2-action@v19
         with:
           config: .markdownlint-cli2.yaml
           globs: ${{ steps.changed-markdown-files.outputs.all_changed_files }}
